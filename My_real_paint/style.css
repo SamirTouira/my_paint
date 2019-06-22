@@ -21,4 +21,11 @@ body
 #draw
 {
 	display: block;
+	border: solid black 1px;
 }
+
+/*#square
+{
+	width: 20px;
+	height: 20px;
+}*/

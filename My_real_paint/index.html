@@ -7,15 +7,317 @@
 <body>
 
 <div class="top-bar">
+	<button id="pen">Pen</button>
 	<button id="save-btn">Save</button>
 	<button id="undo-btn">Undo</button>
+	<button id="redo-btn">Redo</button>
 	<button id="clear-btn">Clear</button>
+	<button id="square">Square</button>
+	<button id="circle">Cercle</button>
+	<button id="gum">Gomme</button>
+	<button id="remplissage">Pot</button>
 	<input type="color" id="color-picker">
 	<input type="range" id="brush-size" min="1" max="50" value="1">
+	<input type="file" id="file">
 </div>
 
 <canvas id="draw"></canvas>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<script type="text/javascript" src="draw.js"></script>
+<!-- <script type="text/javascript" src="draw.js"></script> -->
+
+<script type="text/javascript">
+var canvas = document.getElementById("draw");
+const ctx = canvas.getContext('2d');
+
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let originX, originY;
+
+let DrawAuthorized = false;
+let square = false;
+let draw = false;
+let gum = false;
+let circle = false;
+let dejaClicka = false;
+let pot = false;
+let undoBtn = false;
+let redoBtn = false;
+
+
+ 
+window.addEventListener('keydown', download)
+
+function download(e){
+	if(e.keyCode == 83 && e.ctrlKey){
+		e.preventDefault();
+		let downloadLink = document.createElement('a');
+		let imageData = canvas.toDataURL('image/png');
+		downloadLink.setAttribute('download', 'filename.png');
+		downloadLink.href = imageData;
+		downloadLink.click();
+	}
+}
+//Colors/Size functions
+// const size = $('#brush-size');
+// const colors = $('#color-picker');
+
+$('#color-picker').change(function(){
+	ctx.fillStyle = this.value;
+	ctx.strokeStyle = this.value;
+});
+// colors.addEventListener('change', function(){
+// 	ctx.fillStyle = this.value
+// 	ctx.strokeStyle = this.value;
+// })
+
+
+
+$('#brush-size').change(function(){
+	ctx.lineWidth = this.value;
+});
+// size.addEventListener('change', function(){
+// 	ctx.lineWidth = this.value
+// })
+
+$('#remplissage').click(function(){
+	pot = !pot;
+})
+
+$('#undo-btn').click(function(){
+	undoBtn = !undoBtn;
+})
+
+$('#redo').click(function(){
+	redoBtn = !redoBtn;
+})
+
+$('#clear-btn').click(function(){
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+// clear.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
+
+
+// Square
+$('#draw').click(function(){$('undo-btn').click(function(e){
+if(undoBtn = !undoBtn)
+{
+cPush();
+undo();
+}
+if(redoBtn = !redoBtn)
+{
+cPush(e);
+redo();
+}
+});
+	square = true;
+	draw = false;
+	gum = false;
+	circle = false;
+});
+
+$('#pen').click(function(){
+	draw = true;
+	square = false;
+	gum = false;
+	circle = false;
+})
+
+$('#gum').click(function(){
+	gum = true;
+	draw = false;
+	square = false;
+	circle = false;
+})
+
+$('#circle').click(function(){
+	circle = true;
+	square = false;
+	draw = false;
+	gum = false;
+})
+
+//Event and function on drawing line
+$('#draw').mousedown(function(e){
+	DrawAuthorized = true;
+	originX = e.offsetX;
+	originY = e.offsetY;
+});
+// canvas.addEventListener('mousedown', (e) => {
+// 	DrawAuthorized = true;
+// 	originX = e.offsetX;
+// 	originY = e.offsetY;
+// 	console.log(originY, originX);
+// })
+
+
+
+$('#draw').mousemove(function(e){
+	if (!DrawAuthorized) return; 
+
+	if(draw){
+		ctx.lineJoin = "round";
+		ctx.lineCap = "round";
+		drawLine(e);
+	}
+
+	if(gum){
+		gumLine(e)
+	}
+});
+
+$('#draw').click(function(e){
+	if(square){
+		ctx.lineJoin = "mater";
+		ctx.lineCap = "mater";
+		drawSquare(e);
+	}
+
+	if(circle){
+		drawCircle(e);
+	}
+});
+// canvas.addEventListener('mousemove', (e) => {
+// 	if(!DrawAuthorized) return;
+
+// 	drawLine(e);
+// });
+
+// $('undo-btn').click(function(e){
+// if(undo = !undo)
+// {}
+// });
+
+$('#file')[0].onchange = function(e) {
+	    var files = e.target.files; // FileList object
+	    var file = files[0];
+	    if(file.type.match('image.*')) {
+			const img = new Image();
+	        var reader = new FileReader();
+	        // Read in the image file as a data URL.
+	        reader.readAsDataURL(file);
+	    	reader.onload = function(e){
+	    		if( e.target.readyState == FileReader.DONE) {
+	    			img.src = e.target.result;
+				}
+			}
+			img.onload = function(){
+				ctx.drawImage(img, 0, 0);
+			}    
+
+	    } else {
+	        alert("not an image");
+	    }
+	};
+
+
+$('#draw').mouseup(function(e){
+	DrawAuthorized = false;
+});
+// canvas.addEventListener('mouseup', () => DrawAuthorized = false)
+
+
+function gumLine(e){
+	ctx.clearRect(e.offsetX, e.offsetY, ctx.lineWidth * 2, ctx.lineWidth * 2 );
+}
+
+function sexe(e){
+	let sexeX, sexeY;
+	if(squareStartX > e.offsetX){
+		 sexeX = squareStartX - e.offsetX;
+	}
+	else{
+		 sexeX = e.offsetX - squareStartX;
+	}
+
+	if(squareStartY > e.offsetY){
+		sexeY = squareStartY - e.offsetY;
+	}
+	else{
+		sexeY = e.offsetY - squareStartY;
+	}
+
+	if(sexeX > sexeY){
+		return sexeX + sexeY / Math.PI * 0.90;
+	}
+	else{
+		return sexeY + sexeX / Math.PI * 0.90;
+	}
+}
+
+function drawCircle(e){
+	if(!dejaClicka){
+		squareStartX = e.offsetX;
+		squareStartY = e.offsetY;
+		dejaClicka = true;
+		
+	}
+	else{
+		let rayon = sexe(e);
+		ctx.beginPath();
+		ctx.arc(squareStartX, squareStartY, rayon, 0, 2 * Math.PI);
+		pot ? ctx.fill() : ctx.stroke();
+		ctx.closePath();
+		dejaClicka = false;
+	}
+}
+
+function drawSquare(e){
+	if(!dejaClicka){
+		squareStartX = e.offsetX;
+		squareStartY = e.offsetY;
+		dejaClicka = true;
+	}
+	else{
+		ctx.beginPath();
+		ctx.rect(squareStartX, squareStartY, e.offsetX - squareStartX , e.offsetY - squareStartY);
+		pot ? ctx.fill() : ctx.stroke();
+		ctx.closePath();
+		dejaClicka = false;
+	}
+}
+
+
+function drawLine(e){
+	ctx.beginPath();
+	ctx.moveTo(originX, originY);
+	ctx.lineTo(e.offsetX, e.offsetY);
+	ctx.stroke();
+	ctx.closePath();
+	originX = e.offsetX;
+	originY = e.offsetY;
+}
+var cPushArray = new Array();
+var cStep = -1;
+
+// ctx = document.getElementById('myCanvas').getContext("2d");
+	
+function cPush() {
+    cStep++;
+    if (cStep < cPushArray.length) { cPushArray.length = cStep; }
+    cPushArray.push(canvas.toDataURL());
+}
+function undo(){
+	if (cStep > 0) {
+        cStep--;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = () => {
+			 ctx.drawImage(canvasPic, 0, 0); 
+		}
+    }
+}
+
+function redo() {
+    if (cStep < cPushArray.length-1) {
+        cStep++;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    }
+}
+
+</script>
 </body>
 </html>

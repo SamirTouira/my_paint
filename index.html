@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My_paint</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+	<section>
+		<div id="drawingTools">
+			<div id="colors">
+				<button id="black"></button>
+				<button id="white"></button>
+				<button id="red"></button>
+				<button id="green"></button>
+				<button id="blue"></button>
+
+			</div>
+
+			<div id="otherTools">
+				<button id="clearCanvas">C</button>
+			</div>
+		</div>
+		<canvas id="canvas" width="800" height="500"></canvas>
+	</section>
+	<script src="js/script.js">
+		
+
+//setup variables
+const canvas = $('#draw');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let originX, originY;
+
+let DrawAuthorized = false;
+
+
+
+//Colors/Size functions
+// const size = $('#brush-size');
+// const colors = $('#color-picker');
+
+$('#color-picker').change(function(){
+	ctx.fillStyle = this.value;
+	ctx.strokeStyle = this.value;
+});
+// colors.addEventListener('change', function(){
+// 	ctx.fillStyle = this.value
+// 	ctx.strokeStyle = this.value;
+// })
+
+
+
+$('#brush-size').change(function(){
+	ctx.lineWidth = this.value;
+});
+// size.addEventListener('change', function(){
+// 	ctx.lineWidth = this.value
+// })
+
+
+
+const clear = $('#clear-btn');
+
+$('#clear-btn').click(function(){
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+// clear.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
+
+
+
+//Event and function on drawing line
+$('#draw').mousedown(function(e){
+	DrawAuthorized = true;
+	originX = e.offsetX;
+	originY = e.offsetY;
+});
+// canvas.addEventListener('mousedown', (e) => {
+// 	DrawAuthorized = true;
+// 	originX = e.offsetX;
+// 	originY = e.offsetY;
+// 	console.log(originY, originX);
+// })
+
+
+
+$('#draw');mousemove(function(e){
+	if (!DrawAuthorized) return; 
+
+	drawLine(e);
+});
+// canvas.addEventListener('mousemove', (e) => {
+// 	if(!DrawAuthorized) return;
+
+// 	drawLine(e);
+// });
+
+
+
+
+$('#draw').mouseup(function(e){
+	DrawAuthorized = false;
+});
+// canvas.addEventListener('mouseup', () => DrawAuthorized = false)
+
+
+function drawLine(e){
+	ctx.beginPath();
+	ctx.moveTo(originX, originY);
+	ctx.lineTo(e.offsetX, e.offsetY);
+	ctx.stroke();
+	ctx.closePath();
+	originX = e.offsetX;
+	originY = e.offsetY;
+}
+</script>
+
+</body>
+</html>

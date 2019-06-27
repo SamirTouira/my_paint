@@ -29,7 +29,6 @@
 var canvas = document.getElementById("draw");
 const ctx = canvas.getContext('2d');
 
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let originX, originY;
@@ -66,19 +65,10 @@ $('#color-picker').change(function(){
 	ctx.fillStyle = this.value;
 	ctx.strokeStyle = this.value;
 });
-// colors.addEventListener('change', function(){
-// 	ctx.fillStyle = this.value
-// 	ctx.strokeStyle = this.value;
-// })
-
-
 
 $('#brush-size').change(function(){
 	ctx.lineWidth = this.value;
 });
-// size.addEventListener('change', function(){
-// 	ctx.lineWidth = this.value
-// })
 
 $('#remplissage').click(function(){
 	pot = !pot;
@@ -95,26 +85,12 @@ $('#redo').click(function(){
 $('#clear-btn').click(function(){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
-// clear.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
 
-
-// Square
-$('#draw').click(function(){$('undo-btn').click(function(e){
-if(undoBtn = !undoBtn)
-{
-cPush();
-undo();
-}
-if(redoBtn = !redoBtn)
-{
-cPush(e);
-redo();
-}
-});
-	square = true;
+$('#square').click(function(){	
+ 	square = true;
 	draw = false;
-	gum = false;
-	circle = false;
+ 	gum = false;
+	circle = false; 
 });
 
 $('#pen').click(function(){
@@ -222,27 +198,27 @@ function gumLine(e){
 	ctx.clearRect(e.offsetX, e.offsetY, ctx.lineWidth * 2, ctx.lineWidth * 2 );
 }
 
-function sexe(e){
-	let sexeX, sexeY;
+function Circle(e){
+	let CircleX, CircleY;
 	if(squareStartX > e.offsetX){
-		 sexeX = squareStartX - e.offsetX;
+		 CircleX = squareStartX - e.offsetX;
 	}
 	else{
-		 sexeX = e.offsetX - squareStartX;
+		 CircleX = e.offsetX - squareStartX;
 	}
 
 	if(squareStartY > e.offsetY){
-		sexeY = squareStartY - e.offsetY;
+		CircleY = squareStartY - e.offsetY;
 	}
 	else{
-		sexeY = e.offsetY - squareStartY;
+		CircleY = e.offsetY - squareStartY;
 	}
 
-	if(sexeX > sexeY){
-		return sexeX + sexeY / Math.PI * 0.90;
+	if(CircleX > CircleY){
+		return CircleX + CircleY / Math.PI * 0.90;
 	}
 	else{
-		return sexeY + sexeX / Math.PI * 0.90;
+		return CircleY + CircleX / Math.PI * 0.90;
 	}
 }
 
@@ -254,7 +230,7 @@ function drawCircle(e){
 		
 	}
 	else{
-		let rayon = sexe(e);
+		let rayon = Circle(e);
 		ctx.beginPath();
 		ctx.arc(squareStartX, squareStartY, rayon, 0, 2 * Math.PI);
 		pot ? ctx.fill() : ctx.stroke();
